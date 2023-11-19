@@ -6,6 +6,7 @@ const  mongoose = require("mongoose");
 const  shortid = require("shortid");
 const  Url = require("./Url");
 const  utils = require("./Util/util");
+const qrCode = require("qrcode");
 
 // configure dotenv
 dotenv.config();
@@ -89,6 +90,39 @@ app.get("/:urlId", async (req, res) => {
     res.status(500).json("Server Error");
   }
 });
+
+// Function to generate a QR code for a given short URL
+app.get("/qrcode/:urlId", async (req, res) => {
+  try {
+    const url = await Url.findOne({ urlId: req.params.urlId });
+
+    if (url) {
+      const shortUrl = url.shortUrl;
+
+      // Generate QR code
+      const qrCodeDataUrl = await generateQRCode(shortUrl);
+
+      // Respond with the QR code image
+      res.send(qrCodeDataUrl);
+    } else {
+      res.status(404).json("Not found");
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json("Server Error");
+  }
+});
+
+// Function to generate a QR code from text (short URL)
+async function generateQRCode(text) {
+  try {
+    // Generate QR code and return the data URL
+    const qrCodeDataUrl = await qrCode.toDataURL(text);
+    return qrCodeDataUrl;
+  } catch (error) {
+    throw error;
+  }
+}
 
 // Port Listenning on 3333
 const PORT = process.env.PORT || 3333;
