@@ -14,7 +14,7 @@ const AddUrlComponent = () => {
         }
 
         axios
-          .post("http://localhost:3333/short", {origUrl: url})
+          .post("https://us-central1-synerry-aef3d.cloudfunctions.net/api/short", {origUrl: url})
           .then(res => {
             console.log(res.data);
           })
